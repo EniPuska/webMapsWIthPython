@@ -15,14 +15,15 @@ def setMap():
     lat = list(data["LAT"])
     lon = list(data["LON"])
     elev = list(data["ELEV"])
-
     map = folium.Map(location=[38.58, -99.09], zoom_start=6)
-    featureGroup = folium.FeatureGroup(name = "My Map")
+    featureGroupForVolcanoes = folium.FeatureGroup(name = "Volcanoes")
     for lt, ln, el in zip(lat, lon, elev):
-        featureGroup.add_child(folium.Marker(location = [lt, ln], popup = str(el) + " m", icon = folium.Icon(color = setIconColor(el))))
-        #featureGroup.add_child(folium.CircleMarker(location = [lt, ln], radius = 6, popup = str(el) + " m", 
-    featureGroup.add_child(folium.GeoJson(data = (worldData).read()))
-    map.add_child(featureGroup)
+        featureGroupForVolcanoes.add_child(folium.Marker(location = [lt, ln], popup = str(el) + " m", icon = folium.Icon(color = setIconColor(el))))
+          
+    featureGroupForPopullation = folium.FeatureGroup(name = "Popullation")
+    featureGroupForPopullation.add_child(folium.GeoJson(data = (worldData).read(), style_function=lambda x: {'fillColor':'green' if x['properties']['POP2005'] < 10000000 else 'orange' if 10000000 <= x['properties']['POP2005'] < 20000000 else 'red'}))
+    map.add_child(featureGroupForVolcanoes)
+    map.add_child(featureGroupForPopullation)
+    map.add_child(folium.LayerControl())
     map.save("map.html")
-
 setMap()
